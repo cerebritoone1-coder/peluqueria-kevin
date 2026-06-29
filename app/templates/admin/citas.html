@@ -1,0 +1,79 @@
+﻿{% extends "admin/base_admin.html" %}
+
+{% block title %}Gestión de Citas - Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="text-center mb-4"><i class="fas fa-calendar-check"></i> Gestión de Citas</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Teléfono</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Servicio</th>
+                        <th>Pago</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cita in citas %}
+                    <tr class="{% if cita.estado == 'cancelada' %}table-secondary text-muted{% endif %}">
+                        <td>{{ cita.usuario.nombre }}</td>
+                        <td>{{ cita.usuario.telefono }}</td>
+                        <td>{{ cita.fecha.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ cita.hora }}</td>
+                        <td>{{ cita.servicio.nombre }}</td>
+                        <td>
+                            {% if cita.estado == 'cancelada' %}
+                            <span class="badge bg-secondary">Cancelada</span>
+                            {% elif cita.forma_pago == 'fiado' %}
+                            <span class="badge bg-warning text-dark">💰 Fiado</span>
+                            {% else %}
+                            <span class="badge bg-success">✅ Contado</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if cita.estado == 'pendiente' %}
+                            <span class="badge bg-warning text-dark">⏳ Pendiente</span>
+                            {% elif cita.estado == 'asistió' %}
+                            <span class="badge bg-success">✅ Asistió</span>
+                            {% elif cita.estado == 'no_asistió' %}
+                            <span class="badge bg-danger">❌ No Asistió</span>
+                            {% elif cita.estado == 'cancelada' %}
+                            <span class="badge bg-secondary">Cancelada</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if cita.estado == 'pendiente' %}
+                            <a href="{{ url_for('admin.cita_asistio', cita_id=cita.id) }}" class="btn btn-success btn-sm">
+                                <i class="fas fa-check"></i> Asistió
+                            </a>
+                            <a href="{{ url_for('admin.cita_no_asistio', cita_id=cita.id) }}" class="btn btn-danger btn-sm">
+                                <i class="fas fa-times"></i> No Asistió
+                            </a>
+                            {% elif cita.estado == 'asistió' or cita.estado == 'no_asistió' %}
+                            <a href="{{ url_for('admin.cita_cambiar', cita_id=cita.id) }}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-undo"></i> Cambiar
+                            </a>
+                            {% elif cita.estado == 'cancelada' %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

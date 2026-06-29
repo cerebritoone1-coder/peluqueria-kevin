@@ -1,0 +1,160 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Agendar Cita - Peluquería{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="text-center mb-4"><i class="fas fa-calendar-plus"></i> Agendar Cita</h2>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-cut"></i> Nueva Cita</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="formCita">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="fecha" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="fecha" name="fecha" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="hora" class="form-label">Hora</label>
+                            <select class="form-select" id="hora" name="hora" required>
+                                <option value="">Selecciona una fecha</option>
+                            </select>
+                            <small class="text-muted" id="mensaje-horario"></small>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="servicio_id" class="form-label">Servicio</label>
+                        <select class="form-select" id="servicio_id" name="servicio_id" required>
+                            <option value="">Selecciona un servicio</option>
+                            {% for servicio in servicios %}
+                            <option value="{{ servicio.id }}">✂️ {{ servicio.nombre }} - RD$ {{ servicio.precio }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Forma de Pago</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="forma_pago" id="contado" value="contado" checked>
+                            <label class="form-check-label" for="contado">
+                                <span class="badge bg-success">✅ Pagar de una vez (Contado)</span>
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="forma_pago" id="fiado" value="fiado">
+                            <label class="form-check-label" for="fiado">
+                                <span class="badge bg-warning text-dark">💰 Fiar (Crédito)</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle"></i> <strong>Políticas:</strong>
+                        <ul class="mb-0">
+                            <li>Puedes cancelar la cita hasta 1 hora antes</li>
+                            <li>Si no asistes, tendrás una multa de RD$ 100</li>
+                        </ul>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-check"></i> Confirmar Cita
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Función para cargar horarios
+function cargarHorarios() {
+    var fecha = document.getElementById('fecha').value;
+    var horaSelect = document.getElementById('hora');
+    var mensaje = document.getElementById('mensaje-horario');
+    
+    console.log('Fecha seleccionada:', fecha);
+    
+    if (!fecha) {
+        horaSelect.innerHTML = '<option value="">Selecciona una fecha</option>';
+        mensaje.textContent = '';
+        return;
+    }
+    
+    horaSelect.innerHTML = '<option value="">Cargando...</option>';
+    mensaje.textContent = 'Cargando horarios...';
+    
+    var url = '/cliente/horarios-disponibles?fecha=' + fecha;
+    console.log('URL:', url);
+    
+    fetch(url)
+        .then(function(response) {
+            console.log('Respuesta:', response.status);
+            return response.json();
+        })
+        .then(function(data) {
+            console.log('Datos:', data);
+            
+            horaSelect.innerHTML = '<option value="">Selecciona una hora</option>';
+            var horarios = ['7:30', '8:00', '8:30', '9:00', '9:30', '10:00', '10:30'];
+            var disponibles = 0;
+            
+            for (var i = 0; i < horarios.length; i++) {
+                var hora = horarios[i];
+                var option = document.createElement('option');
+                option.value = hora;
+                
+                if (data.disponibles.indexOf(hora) !== -1) {
+                    option.textContent = '✅ ' + hora + ' (Disponible)';
+                    disponibles++;
+                } else {
+                    option.textContent = '❌ ' + hora + ' (Ocupado)';
+                    option.disabled = true;
+                }
+                horaSelect.appendChild(option);
+            }
+            
+            if (disponibles > 0) {
+                mensaje.textContent = '✅ ' + disponibles + ' horarios disponibles';
+                mensaje.style.color = 'green';
+            } else {
+                mensaje.textContent = '❌ No hay horarios disponibles';
+                mensaje.style.color = 'red';
+            }
+        })
+        .catch(function(error) {
+            console.error('Error:', error);
+            horaSelect.innerHTML = '<option value="">Error al cargar</option>';
+            mensaje.textContent = '❌ Error al cargar horarios';
+            mensaje.style.color = 'red';
+        });
+}
+
+// Esperar a que la página cargue
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('✅ Página cargada');
+    
+    var fechaInput = document.getElementById('fecha');
+    
+    // Fecha mínima = hoy
+    var hoy = new Date();
+    var año = hoy.getFullYear();
+    var mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    var dia = String(hoy.getDate()).padStart(2, '0');
+    fechaInput.min = año + '-' + mes + '-' + dia;
+    console.log('Fecha mínima:', fechaInput.min);
+    
+    // Cuando cambie la fecha
+    fechaInput.addEventListener('change', cargarHorarios);
+    
+    // También cuando se seleccione con el mouse
+    fechaInput.addEventListener('input', cargarHorarios);
+});
+</script>
+{% endblock %}

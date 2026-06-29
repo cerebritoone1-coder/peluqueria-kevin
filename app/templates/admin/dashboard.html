@@ -1,0 +1,101 @@
+﻿{% extends "admin/base_admin.html" %}
+{% block title %}Inicio - Admin{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="text-center mb-4 text-white"><i class="fas fa-home"></i> Panel de Control</h2>
+    </div>
+</div>
+<!-- Tarjetas de Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center bg-white text-dark shadow">
+            <div class="card-body">
+                <h3 class="text-dark">{{ total_citas }}</h3>
+                <p class="text-dark">Citas Totales</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-white text-dark shadow">
+            <div class="card-body">
+                <h3 class="text-dark">{{ asistieron }}</h3>
+                <p class="text-dark">Asistieron</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-white text-dark shadow">
+            <div class="card-body">
+                <h3 class="text-dark">{{ no_asistieron }}</h3>
+                <p class="text-dark">No Asistieron</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center bg-white text-dark shadow">
+            <div class="card-body">
+                <h3 class="text-dark">{{ pendientes }}</h3>
+                <p class="text-dark">Pendientes</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Ingresos -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card text-center bg-white text-dark shadow">
+            <div class="card-body">
+                <h4 class="text-dark">💰 Total Ingresos</h4>
+                <h2 class="text-dark">RD$ {{ "%.2f"|format(total_ingresos) }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center bg-white text-dark shadow">
+            <div class="card-body">
+                <h4 class="text-dark">✅ Contado</h4>
+                <h2 class="text-dark">RD$ {{ "%.2f"|format(total_contado) }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center bg-white text-dark shadow">
+            <div class="card-body">
+                <h4 class="text-dark">💰 Fiado Pendiente</h4>
+                <h2 class="text-dark">RD$ {{ "%.2f"|format(fiado_pendiente) }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Multas -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card text-center bg-white text-dark shadow">
+            <div class="card-body">
+                <h4 class="text-dark">⚠️ Multas Cobradas</h4>
+                <h2 class="text-dark">RD$ {{ "%.2f"|format(multas_cobradas) }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card text-center bg-white text-dark shadow">
+            <div class="card-body">
+                <h4 class="text-dark">⚠️ Multas Pendientes</h4>
+                <h2 class="text-dark">RD$ {{ "%.2f"|format(multas_pendientes) }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Servicio más solicitado -->
+<div class="row">
+    <div class="col-12">
+        <div class="card text-center bg-white text-dark shadow">
+            <div class="card-body">
+                <h4 class="text-dark">✂️ Servicio más solicitado</h4>
+                <h3 class="text-dark">{{ servicio_mas_solicitado }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

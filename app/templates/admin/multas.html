@@ -1,0 +1,86 @@
+﻿{% extends "admin/base_admin.html" %}
+
+{% block title %}Gestión de Multas - Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="text-center mb-4"><i class="fas fa-exclamation-triangle"></i> Gestión de Multas</h2>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="alert alert-danger">
+            <strong>Multas Pendientes:</strong> RD$ {{ "%.2f"|format(total_pendiente) }}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="alert alert-success">
+            <strong>Multas Cobradas:</strong> RD$ {{ "%.2f"|format(total_cobrado) }}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Teléfono</th>
+                        <th>Cita</th>
+                        <th>Monto</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for multa in multas %}
+                    <tr>
+                        <td>{{ multa.usuario.nombre }}</td>
+                        <td>{{ multa.usuario.telefono }}</td>
+                        <td>
+                            {% if multa.cita %}
+                                {{ multa.cita.fecha.strftime('%d/%m/%Y') }} {{ multa.cita.hora }}
+                            {% else %}
+                                <span class="text-muted">Cita eliminada</span>
+                            {% endif %}
+                        </td>
+                        <td>RD$ {{ "%.2f"|format(multa.monto) }}</td>
+                        <td>{{ multa.fecha_generacion.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            {% if multa.pagada %}
+                            <span class="badge bg-success">✅ Pagada</span>
+                            {% else %}
+                            <span class="badge bg-danger">⚠️ Pendiente</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if not multa.pagada %}
+                            <a href="{{ url_for('admin.multa_pagar', multa_id=multa.id) }}" class="btn btn-success btn-sm">
+                                <i class="fas fa-check"></i> Pagar
+                            </a>
+                            <a href="{{ url_for('admin.multa_eliminar', multa_id=multa.id) }}" 
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('¿Estás seguro de eliminar esta multa? Esta acción no se puede deshacer.')">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </a>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">No hay multas registradas</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

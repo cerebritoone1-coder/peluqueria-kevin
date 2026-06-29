@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Citas - Peluquería{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="text-center mb-4"><i class="fas fa-list"></i> Mis Citas</h2>
+    </div>
+</div>
+
+<!-- Multas Pendientes -->
+{% if total_multas > 0 %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle"></i> <strong>¡Atención!</strong> Tienes multas pendientes por RD$ {{ total_multas }}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Lista de Citas -->
+<div class="row">
+    <div class="col-12">
+        {% if citas %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Servicio</th>
+                        <th>Pago</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cita in citas %}
+                    {% if cita.estado != 'cancelada' %}
+                    <tr>
+                        <td>{{ cita.fecha.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ cita.hora }}</td>
+                        <td>{{ cita.servicio.nombre }}</td>
+                        <td>
+                            {% if cita.estado == 'cancelada' %}
+                            <span class="badge bg-secondary">Cancelada</span>
+                            {% elif cita.forma_pago == 'fiado' %}
+                            <span class="badge bg-warning text-dark">💰 Fiado</span>
+                            {% else %}
+                            <span class="badge bg-success">✅ Contado</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if cita.estado == 'pendiente' %}
+                            <span class="badge bg-warning text-dark">⏳ Pendiente</span>
+                            {% elif cita.estado == 'asistió' %}
+                            <span class="badge bg-success">✅ Asistió</span>
+                            {% elif cita.estado == 'no_asistió' %}
+                            <span class="badge bg-danger">❌ No Asistió</span>
+                            {% elif cita.estado == 'cancelada' %}
+                            <span class="badge bg-secondary">Cancelada</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if cita.estado == 'pendiente' %}
+                            <a href="{{ url_for('cliente.cancelar_cita', cita_id=cita.id) }}" 
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('¿Estás seguro de cancelar esta cita?')">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Mostrar citas canceladas en una sección separada -->
+        {% set citas_canceladas = citas|selectattr('estado', 'equalto', 'cancelada')|list %}
+        {% if citas_canceladas %}
+        <div class="mt-4">
+            <h5 class="text-muted"><i class="fas fa-history"></i> Citas Canceladas</h5>
+            <div class="table-responsive">
+                <table class="table table-sm table-borderless">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Servicio</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cita in citas_canceladas %}
+                        <tr class="text-muted">
+                            <td>{{ cita.fecha.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ cita.hora }}</td>
+                            <td>{{ cita.servicio.nombre }}</td>
+                            <td><span class="badge bg-secondary">Cancelada</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> No tienes citas agendadas
+            <br>
+            <a href="{{ url_for('cliente.agendar') }}" class="btn btn-primary mt-2">
+                <i class="fas fa-calendar-plus"></i> Agendar Cita
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

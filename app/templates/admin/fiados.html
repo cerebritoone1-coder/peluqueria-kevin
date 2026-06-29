@@ -1,0 +1,60 @@
+﻿{% extends "admin/base_admin.html" %}
+
+{% block title %}Fiados Pendientes - Admin{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="text-center mb-4"><i class="fas fa-hand-holding-usd"></i> Fiados Pendientes</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <strong>Total Fiado Pendiente:</strong> RD$ {{ "%.2f"|format(total_fiado) }}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Teléfono</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Servicio</th>
+                        <th>Monto</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cita in citas_fiadas %}
+                    <tr>
+                        <td>{{ cita.usuario.nombre }}</td>
+                        <td>{{ cita.usuario.telefono }}</td>
+                        <td>{{ cita.fecha.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ cita.hora }}</td>
+                        <td>{{ cita.servicio.nombre }}</td>
+                        <td>RD$ {{ "%.2f"|format(cita.servicio.precio) }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.fiado_cobrar', cita_id=cita.id) }}" class="btn btn-success btn-sm">
+                                <i class="fas fa-dollar-sign"></i> Cobrar
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">No hay fiados pendientes</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
